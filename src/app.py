@@ -123,6 +123,21 @@ def get_favorites_pokemon(id):
     favorites = db.session.execute(query).scalars().all()
     return jsonify([fav.pokemon.serialize() for fav in favorites])
 
+##eliminamos de favoritos un pokemon por id de user y id de pokemon
+@app.route('/user/<int:user_id>/favorites/pokemon/<int:pokemon_id>', methods=["DELETE"] )
+def delete_favorite_pokemon(user_id, pokemon_id):
+    query = select(FavoritesPokemon).where(
+        FavoritesPokemon.user_id == user_id,
+        FavoritesPokemon.pokemon_id == pokemon_id
+    )
+    favorite = db.session.execute(query).scalars().first()
+
+    if not favorite:
+        return jsonify({"error": "Favorito no encontrado"}), 404
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({"success": "Pokemon eliminado de favoritos"}),200
 
 # ------------------------
 #  FAVORITESITEMS
@@ -144,6 +159,23 @@ def get_favorites_items(id):
     query = select(FavoritesItems).where(FavoritesItems.user_id == id)
     favorites = db.session.execute(query).scalars().all()
     return jsonify([fav.items.serialize() for fav in favorites])
+
+
+##eliminamos de favoritos un item por id de user y id de pokemon
+@app.route('/user/<int:user_id>/favorites/item/<int:item_id>', methods=["DELETE"] )
+def delete_favorite_item(user_id, item_id):
+    query = select(FavoritesItems).where(
+        FavoritesItems.user_id == user_id,
+        FavoritesItems.item_id == item_id
+    )
+    favorite = db.session.execute(query).scalars().first()
+
+    if not favorite:
+        return jsonify({"error": "Favorito no encontrado"}), 404
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({"success": "Item eliminado de favoritos"}),200
 
 
 # this only runs if `$ python src/app.py` is executed
